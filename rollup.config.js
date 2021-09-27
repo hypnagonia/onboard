@@ -94,6 +94,7 @@ export default {
     '@shapeshiftoss/hdwallet-core',
     '@gnosis.pm/safe-apps-sdk',
     '@gnosis.pm/safe-apps-provider',
-    '@ensdomains/ensjs'
+    '@ensdomains/ensjs',
+    'broadcast-channel'
   ]
 }
