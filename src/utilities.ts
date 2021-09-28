@@ -138,7 +138,6 @@ export function getBalance(
 
 export function createModernProviderInterface(provider: any): WalletInterface {
   provider.autoRefreshOnNetworkChange = false
-
   const onFuncExists = typeof provider.on === 'function'
 
   interface ProviderEventHandlers {
@@ -204,6 +203,7 @@ export function createModernProviderInterface(provider: any): WalletInterface {
       get: () => getBalance(provider)
     },
     connect: async () => {
+      console.log('metamask connect')
       try {
         if (provider.request) {
           const result = await provider.request({
@@ -236,6 +236,10 @@ export function createModernProviderInterface(provider: any): WalletInterface {
 }
 
 export function createLegacyProviderInterface(provider: any): WalletInterface {
+
+  console.log('metamask createLegacyProviderInterface')
+
+
   return {
     address: {
       get: () => getAddress(provider)
@@ -359,6 +363,10 @@ export function getProviderName(provider: any): string | undefined {
 
   if (provider.isMetaMask && provider._metamask) {
     return 'MetaMask'
+  }
+
+  if (provider.onewallet) {
+    return 'ONEWallet'
   }
 
   if (provider.host && provider.host.indexOf('localhost') !== -1) {

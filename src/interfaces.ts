@@ -159,6 +159,8 @@ export interface WalletInterface {
   network: StateSyncer
   balance: StateSyncer
   dashboard?: () => void
+  send?: any
+  request?: any
 }
 
 export interface StateSyncer {

@@ -143,26 +143,28 @@ export function createModernProviderInterface(provider: any): WalletInterface {
             ? {
                 onChange: (func: (val: string | number) => void) => {
                     console.log('onChange network')
-                    providerEventHandler['networkChanged'] = (netId: string | number) =>
-                        func(netId && Number(netId))
+
+
+                    //providerEventHandler['networkChanged'] = (netId: string | number) =>
+                    //    func(netId && Number(netId))
 
                     // We clone the previous handler in order to get a distinct refference
                     // to the 'chainChanged' event handler
-                    providerEventHandler['chainChanged'] = providerEventHandler[
-                        'networkChanged'
-                        ].bind({})
+                    //providerEventHandler['chainChanged'] = providerEventHandler[
+                    //    'networkChanged'
+                    //    ].bind({})
 
                     // get initial value
                     getNetwork(provider).then(func)
 
                     // networkChanged event is deprecated in MM, keep for wallets that may not have updated
-                    provider.on(
-                        'networkChanged',
-                        providerEventHandler['networkChanged'],
-                    )
+                    //provider.on(
+                    //    'networkChanged',
+                    //    providerEventHandler['networkChanged'],
+                    //)
 
                     // use new chainChanged event for network change
-                    provider.on('chainChanged', providerEventHandler['chainChanged'])
+                    //provider.on('chainChanged', providerEventHandler['chainChanged'])
                 },
             }
             : {get: () => getNetwork(provider)},
@@ -173,7 +175,7 @@ export function createModernProviderInterface(provider: any): WalletInterface {
             console.log('connect')
             try {
 
-                const a = await ONEWallet.auth()
+                const a = '' //await ONEWallet.auth()
                 actualAddress = a as string || ''
 
                 providerEventHandler['accountsChanged'] && providerEventHandler['accountsChanged']([])
@@ -339,7 +341,7 @@ export function getProviderName(provider: any): string | undefined {
     }
 
     if (provider.onewallet) {
-        return 'ONE Wallet'
+        return 'ONEWallet'
     }
 
     if (provider.host && provider.host.indexOf('localhost') !== -1) {

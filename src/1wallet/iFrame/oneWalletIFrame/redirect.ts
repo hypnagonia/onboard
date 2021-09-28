@@ -5,7 +5,7 @@ const oneWalletURL = 'https://1wallet.crazy.one/auth'
 const callbackLocation = '/one-wallet-iframe-callback'
 const callbackURL = window.location.origin + callbackLocation
 const callbackLocationBase64 = btoa(callbackURL)
-const appName = 'ONE Wallet Integration Demo App'
+const appName = 'Harmony MultiSig'
 
 
 export const auth = () => {
