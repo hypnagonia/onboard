@@ -37,6 +37,35 @@ export const send = (from: string, to: string, amount: number) => {
 }
 
 
+/*
+https://localhost:3000/auth/call?caller=Tip%20Jar&callback=aHR0cHM6Ly9nb29nbGUuY29t&amount=1000000000000000000&dest=0x37CCbeAa1d176f77227AEa39BE5888BF8768Bf85&calldata=eyJtZXRob2QiOiJyZW5ldyh1aW50MzIsYnl0ZXM0KSIsInBhcmFtZXRlcnMiOlt7Im5hbWUiOiJwZXJpb2QiLCJ2YWx1ZSI6MX0seyJuYW1lIjoic2lnbmF0dXJlIiwidmFsdWUiOiIweDEyMzQ1Njc4In1dLCJjb21tZW50IjoidGVzdGluZyIsImhleCI6IjB4ZjMyYWM1YTQwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMTIzNDU2NzgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9
+*/
+export const call = (to: string, bytecode: string, amount: number) => {
+    const calldata = btoa(JSON.stringify(
+        {
+            hex: bytecode
+        }
+    ))
+
+    const o = {
+        caller: appName,
+        callback: callbackLocationBase64,
+        calldata,
+        dest: to,
+    }
+
+    if (amount) {
+        // @ts-ignore
+        o.amount = (BigInt(amount) * BigInt(1000000000000000000)).toString()
+    }
+
+    const params = new URLSearchParams(o).toString()
+    const url = oneWalletURL + '/call?' + params
+
+    console.log(url)
+    popup.open(url)
+}
+
 const processONEWalletCallback = () => {
     const path = window.location.pathname
 
@@ -53,12 +82,11 @@ const processONEWalletCallback = () => {
     if (success && address) {
         window.dispatchEvent(new CustomEvent(events.walletConnectedEvent, {detail: address}))
     } else if (success && txId) {
-        window.dispatchEvent(new CustomEvent(events.transactionSentEvent, {detail: txId}))
+        window.dispatchEvent(new CustomEvent(events.transactionCallEvent, {detail: txId}))
     } else if (!success && txId) {
-        window.dispatchEvent(new CustomEvent(events.transactionSentErrorEvent))
+        window.dispatchEvent(new CustomEvent(events.transactionCallErrorEvent))
     } else {
-        // todo cancel event
-        window.dispatchEvent(new CustomEvent(events.transactionSentErrorEvent))
+        window.dispatchEvent(new CustomEvent(events.transactionCallErrorEvent))
     }
 
     window.close()

@@ -67,3 +67,30 @@ export const send = async (from: string, to: string, amount: number) => {
         channel.addEventListener('message', handler)
     })
 }
+
+export const call = async (to: string, bytecode: string, amount: number) => {
+    if (popup.isOpen) {
+        return null
+    }
+
+    redirect.call(to, bytecode, amount)
+
+    return new Promise((resolve, reject) => {
+        const handler = (crossTabEvent: string) => {
+            popup.close()
+            const e = parseMessage(crossTabEvent)
+
+            if (e.eventName === events.transactionCallEvent) {
+                channel.removeEventListener('message', handler)
+                resolve(e.payload)
+            }
+
+            if (e.eventName === events.transactionCallErrorEvent) {
+                channel.removeEventListener('message', handler)
+                reject(e.payload)
+            }
+        }
+
+        channel.addEventListener('message', handler)
+    })
+}

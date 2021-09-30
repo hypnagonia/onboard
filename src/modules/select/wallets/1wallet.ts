@@ -19,6 +19,11 @@ const wrapRPCResponse = (data: any, result: any) => {
     }
 }
 
+const wrapRPCError = (data: any, err: any) => {
+    return {'jsonrpc': '2.0', 'id': data.id, 'error': {'code': -32602, 'message': JSON.stringify(err)}}
+
+}
+
 function oneWallet(
     options: SdkWalletOptions & { networkId: number; rpcUrl: string },
 ): WalletModule {
@@ -41,7 +46,6 @@ function oneWallet(
                 provider: {
                     // @ts-ignore
                     send: (data, cb, ...rest) => {
-                        try {
                             const {method} = data
 
                             if (method === 'eth_accounts') {
@@ -55,7 +59,7 @@ function oneWallet(
                             }
 
                             if (method === 'eth_getCode') {
-                                cb(null, wrapRPCResponse(data, ''))
+                                cb(null, wrapRPCResponse(data, '0x1'))
                                 return
                             }
 
@@ -65,17 +69,27 @@ function oneWallet(
                             }
 
 
-                            /*
-                            "eth_sendTransaction"
-                            send to from
-                            * */
+                            if (method === 'eth_sendTransaction') {
+                                const call = async () => {
+                                    let res = []
+                                    for (const p of data.params) {
+                                        const amount = p.value || p.amount || 0
 
+                                        try {
+                                            const r = await ONEWallet.call(p.to, p.data, amount)
+                                            res.push(r)
+                                        } catch (e) {
+                                            return cb(wrapRPCError(data, e), null)
+                                        }
 
-                            console.log('provider send', {data, cb, rest})
+                                    }
 
-                        } catch (err) {
-                            console.error(err)
-                        }
+                                    cb(null, wrapRPCResponse(data, res))
+                                }
+
+                                return call()
+                            }
+
                     },
                 },
                 interface: {
@@ -111,6 +125,7 @@ function oneWallet(
         type: 'sdk',
         desktop: true,
         mobile: true,
+        link: 'http://1wallet.crazy.one/',
         preferred,
     }
 }
@@ -155,3 +170,16 @@ export default oneWallet
 }
 
 export default oneWallet*/
+
+/*
+
+curl --location --request POST 'https://a.api.s0.t.hmny.io' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"jsonrpc": "2.0",
+  "method": "eth_getLogs",
+  "id": 1,
+  "params": [{"fromBlock": "0x7ec6ab", "toBlock": "0x7ec6345353453453453445ab"}]
+}'
+
+ */
