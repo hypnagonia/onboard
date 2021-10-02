@@ -85,7 +85,8 @@
     "regenerator-runtime": "^0.13.7",
     "trezor-connect": "^8.1.9",
     "walletlink": "^2.1.11",
-    "web3-provider-engine": "^15.0.4"
+    "web3-provider-engine": "^15.0.4",
+    "web3-providers-http": "^1.6.0"
   },
   "resolutions": {
     "authereum/web3-utils/underscore": "^1.12.1",
