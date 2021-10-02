@@ -43,6 +43,9 @@ export const open = (url: string) => {
     iframeElement = document.createElement('iframe')
     iframeElement.id = iFrameDOMID
     iframeElement.style.width = popupWidth + 'px'
+    iframeElement.style.border = '0'
+    // @ts-ignore
+    iframeElement.style.frameBorder = '0'
     iframeElement.style.height = popupHeight + 'px'
     // @ts-ignore
     iframeElement.src = url

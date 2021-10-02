@@ -3,9 +3,6 @@ import {WalletModule, Helpers, CommonWalletOptions, SdkWalletOptions} from '../.
 
 import metamaskIcon from '../wallet-icons/icon-onewallet.svg'
 import metamaskIcon2x from '../wallet-icons/icon-onewallet.svg'
-import {createModernProviderInterface} from '../../../1wallet/utilities'
-import fortmaticIcon from '../wallet-icons/icon-fortmatic'
-import {networkName} from '../../../utilities'
 
 const getProviderName = () => 'ONE Wallet'
 import * as ONEWallet from '../../../1wallet/iFrame/oneWalletIFrame/index'
@@ -25,6 +22,13 @@ const wrapRPCError = (data: any, err: any) => {
 
 const rpcHarmonyUrl = 'https://api.harmony.one'
 
+const localStorageId = '1walletSessionAddress'
+
+const storage = {
+    saveAddress: (address: string) => window.localStorage.setItem(localStorageId, address),
+    loadAddress: () => window.localStorage.getItem(localStorageId),
+    deleteAddress: () => window.localStorage.removeItem(localStorageId),
+}
 
 function oneWallet(
     options: SdkWalletOptions & { networkId: number; rpcUrl: string },
@@ -32,7 +36,7 @@ function oneWallet(
     const {apiKey, rpcUrl, networkId, preferred, label, iconSrc, svg} = options
 
     return {
-        name: label || 'ONE Wallet',
+        name: label || '1Wallet',
         iconSrc: iconSrc || metamaskIcon,
         iconSrcSet: iconSrc || metamaskIcon2x,
         wallet: async (helpers: Helpers) => {
@@ -51,7 +55,8 @@ function oneWallet(
                         const {method} = data
 
                         if (method === 'eth_accounts') {
-                            cb(null, wrapRPCResponse(data, [actualAddress]))
+                            const savedAddress = storage.loadAddress()
+                            cb(null, wrapRPCResponse(data, [actualAddress || savedAddress]))
                             return
                         }
 
@@ -101,7 +106,7 @@ function oneWallet(
                         if (method === 'eth_getTransactionReceipt') {
                             // @ts-ignore
                             const call = async () => {
-                                console.log('eth_getTransactionReceipt call', data)
+                                // console.log('eth_getTransactionReceipt call', data)
                                 try {
                                     const resRaw = await fetch(rpcHarmonyUrl, {
                                         headers: {
@@ -117,10 +122,10 @@ function oneWallet(
 
                                     const res = await resRaw.json()
 
-                                    console.log('eth_getTransactionReceipt success', res)
+                                    // console.log('eth_getTransactionReceipt success', res)
                                     cb(null, res)
                                 } catch (e) {
-                                    console.log('eth_getTransactionReceipt err', e)
+                                    // console.log('eth_getTransactionReceipt err', e)
                                     cb(wrapRPCError(data, e), null)
                                 }
 
@@ -132,7 +137,7 @@ function oneWallet(
                         if (method === 'eth_getTransactionByHash') {
                             // @ts-ignore
                             const call = async () => {
-                                console.log('eth_getTransactionByHash call', data)
+                                // console.log('eth_getTransactionByHash call', data)
                                 try {
                                     const resRaw = await fetch(rpcHarmonyUrl, {
                                         headers: {
@@ -148,10 +153,10 @@ function oneWallet(
 
                                     const res = await resRaw.json()
 
-                                    console.log('eth_getTransactionByHash response', res)
+                                    // console.log('eth_getTransactionByHash response', res)
                                     cb(null, res)
                                 } catch (e) {
-                                    console.log('eth_getTransactionByHash err', e)
+                                    // console.log('eth_getTransactionByHash err', e)
                                     cb(wrapRPCError(data, e), null)
                                 }
 
@@ -163,7 +168,7 @@ function oneWallet(
                         if (method === 'eth_call') {
                             // @ts-ignore
                             const call = async () => {
-                                console.log('eth_call call', data)
+                                //  console.log('eth_call call', data)
                                 try {
                                     const resRaw = await fetch(rpcHarmonyUrl, {
                                         headers: {
@@ -179,10 +184,10 @@ function oneWallet(
 
                                     const res = await resRaw.json()
 
-                                    console.log('eth_call response', res)
+                                    // console.log('eth_call response', res)
                                     cb(null, res)
                                 } catch (e) {
-                                    console.log('eth_call err', e)
+                                    // console.log('eth_call err', e)
                                     cb(wrapRPCError(data, e), null)
                                 }
 
@@ -194,7 +199,7 @@ function oneWallet(
                         if (method === 'eth_getBalance') {
                             // @ts-ignore
                             const call = async () => {
-                                console.log('eth_getBalance  call', data)
+                                // console.log('eth_getBalance  call', data)
                                 try {
                                     const resRaw = await fetch(rpcHarmonyUrl, {
                                         headers: {
@@ -210,10 +215,10 @@ function oneWallet(
 
                                     const res = await resRaw.json()
 
-                                    console.log('eth_getBalance  response', res)
+                                    //  console.log('eth_getBalance  response', res)
                                     cb(null, res)
                                 } catch (e) {
-                                    console.log('eth_getBalance err', e)
+                                    //   console.log('eth_getBalance err', e)
                                     cb(wrapRPCError(data, e), null)
                                 }
 
@@ -221,7 +226,6 @@ function oneWallet(
 
                             return call()
                         }
-
 
 
                         if (method === 'eth_sendTransaction') {
@@ -246,26 +250,42 @@ function oneWallet(
                             return call()
                         }
 
-                        console.log('not supported',method, data)
+                        console.log('not supported', method, data)
 
                     },
                 },
                 interface: {
                     name: 'ONEWallet',
-                    connect: () =>
-                        ONEWallet.auth().then(address => {
-                            console.log({address})
+                    connect: async () => {
+                        const savedAddress = storage.loadAddress()
+
+                        if (savedAddress) {
+                            return [savedAddress]
+                        }
+
+                        return ONEWallet.auth().then(address => {
+
                             if (address) {
                                 enabled = true
                                 actualAddress = address as string
+                                storage.saveAddress(actualAddress as string)
                             }
 
                             return actualAddress ? [actualAddress] : undefined
-                        }),
+                        })
+                    },
                     disconnect: () => {
+                        storage.deleteAddress()
                     },
                     address: {
-                        get: () => ((enabled && actualAddress) ? Promise.resolve(actualAddress || '') : Promise.resolve(null)),
+                        get: () => {
+                            const savedAddress = storage.loadAddress()
+                            if (!enabled && !actualAddress && savedAddress) {
+                                enabled = true
+                                actualAddress = savedAddress
+                            }
+                            return ((enabled && actualAddress) ? Promise.resolve(actualAddress || '') : Promise.resolve(null))
+                        },
                     },
                     network: {
                         get: () => Promise.resolve(networkId),
