@@ -69,7 +69,7 @@ export const call = (to: string, bytecode: string, amount: number) => {
 const processONEWalletCallback = () => {
     const path = window.location.pathname
 
-    if (path.indexOf(callbackLocation) !== 0) {
+    if (path.indexOf(callbackLocation) === -1) {
         return
     }
 

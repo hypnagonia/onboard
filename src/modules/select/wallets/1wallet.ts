@@ -1,4 +1,3 @@
-import {extensionInstallMessage, mobileWalletInstallMessage} from '../content'
 import {WalletModule, Helpers, CommonWalletOptions, SdkWalletOptions} from '../../../interfaces'
 
 import metamaskIcon from '../wallet-icons/icon-onewallet.svg'
@@ -8,7 +7,6 @@ const getProviderName = () => 'ONE Wallet'
 import * as ONEWallet from '../../../1wallet/iFrame/oneWalletIFrame/index'
 
 const wrapRPCResponse = (data: any, result: any) => {
-    // console.log('response', {result})
     return {
         // @ts-ignore
         'jsonrpc': '2.0', 'id': data.id, result: result,
@@ -42,7 +40,7 @@ function oneWallet(
         wallet: async (helpers: Helpers) => {
 
             // const provider = instance.getProvider()
-            const {BigNumber, getAddress} = helpers
+            // const {BigNumber, getAddress} = helpers
 
             let enabled: boolean
             let actualAddress: string | undefined
@@ -51,7 +49,7 @@ function oneWallet(
             return {
                 provider: {
                     // @ts-ignore
-                    send: (data, cb, ...rest) => {
+                    send: (data, cb) => {
                         const {method} = data
 
                         if (method === 'eth_accounts') {
@@ -310,54 +308,3 @@ function oneWallet(
 
 export default oneWallet
 
-
-/*function oneWallet(
-    options: CommonWalletOptions & { isMobile: boolean },
-): WalletModule {
-    const {preferred, label, iconSrc, svg, isMobile} = options
-
-    // @ts-ignore
-    return {
-        name: label || 'ONE Wallet',
-        iconSrc: iconSrc || metamaskIcon,
-        iconSrcSet: iconSrc || metamaskIcon2x,
-        svg,
-        wallet: async (helpers: Helpers) => {
-
-
-            const provider =
-                (window as any).ethereum ||
-                ((window as any).web3 && (window as any).web3.currentProvider)
-
-            return {
-                provider,
-                // @ts-ignore
-                interface: createModernProviderInterface(provider),
-            }
-        },
-        type: 'injected',
-        // link: `https://metamask.app.link/dapp/${window.location.host}`,
-        link: 'http://1wallet.crazy.one/',
-        installMessage: isMobile
-            ? mobileWalletInstallMessage
-            : extensionInstallMessage,
-        desktop: true,
-        mobile: true,
-        preferred,
-    }
-}
-
-export default oneWallet*/
-
-/*
-
-curl --location --request POST 'https://a.api.s0.t.hmny.io' \
---header 'Content-Type: application/json' \
---data-raw '{
-"jsonrpc": "2.0",
-  "method": "eth_getLogs",
-  "id": 1,
-  "params": [{"fromBlock": "0x7ec6ab", "toBlock": "0x7ec6345353453453453445ab"}]
-}'
-
- */
