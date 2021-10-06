@@ -1,11 +1,21 @@
 import * as events from './events'
 import * as popup from './popup'
+import {isSafari} from './utils'
 
 const oneWalletURL = 'https://1wallet.crazy.one/auth'
 const callbackLocation = '/one-wallet-iframe-callback'
 const callbackURL = window.location.origin + callbackLocation
 const callbackLocationBase64 = btoa(callbackURL)
 const appName = 'Harmony MultiSig'
+
+
+const redirect = (url: string) => {
+    if (isSafari()) {
+        window.open(url, '_blank')
+    } else {
+        popup.open(url)
+    }
+}
 
 
 export const auth = () => {
@@ -17,8 +27,7 @@ export const auth = () => {
     const params = new URLSearchParams(o).toString()
     const url = oneWalletURL + '/connect?' + params
 
-    popup.open(url)
-    // window.open(url, '_blank')
+    redirect(url)
 }
 
 export const send = (from: string, to: string, amount: number) => {
@@ -33,7 +42,7 @@ export const send = (from: string, to: string, amount: number) => {
     const params = new URLSearchParams(o).toString()
     const url = oneWalletURL + '/pay?' + params
 
-    popup.open(url)
+    redirect(url)
 }
 
 
@@ -43,8 +52,8 @@ https://localhost:3000/auth/call?caller=Tip%20Jar&callback=aHR0cHM6Ly9nb29nbGUuY
 export const call = (to: string, bytecode: string, amount: number) => {
     const calldata = btoa(JSON.stringify(
         {
-            hex: bytecode
-        }
+            hex: bytecode,
+        },
     ))
 
     const o = {
@@ -62,8 +71,7 @@ export const call = (to: string, bytecode: string, amount: number) => {
     const params = new URLSearchParams(o).toString()
     const url = oneWalletURL + '/call?' + params
 
-    console.log(url)
-    popup.open(url)
+    redirect(url)
 }
 
 const processONEWalletCallback = () => {
