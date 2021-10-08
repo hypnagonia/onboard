@@ -1,6 +1,6 @@
 import * as events from './events'
 import * as popup from './popup'
-import {isSafari} from './utils'
+import {isSafari, isPopupBlocked} from './utils'
 
 const oneWalletURL = 'https://1wallet.crazy.one/auth'
 const callbackLocation = '/one-wallet-iframe-callback'
@@ -9,9 +9,15 @@ const callbackLocationBase64 = btoa(callbackURL)
 const appName = 'Harmony MultiSig'
 
 
+
 const redirect = (url: string) => {
     if (isSafari()) {
-        window.open(url, '_blank')
+        const w = window.open(url, '_blank')
+
+        if (isPopupBlocked(w)) {
+            popup.openClickToRedirectModal(url)
+        }
+
     } else {
         popup.open(url)
     }
