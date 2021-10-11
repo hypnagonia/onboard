@@ -55,7 +55,7 @@ export const send = (from: string, to: string, amount: number) => {
 /*
 https://localhost:3000/auth/call?caller=Tip%20Jar&callback=aHR0cHM6Ly9nb29nbGUuY29t&amount=1000000000000000000&dest=0x37CCbeAa1d176f77227AEa39BE5888BF8768Bf85&calldata=eyJtZXRob2QiOiJyZW5ldyh1aW50MzIsYnl0ZXM0KSIsInBhcmFtZXRlcnMiOlt7Im5hbWUiOiJwZXJpb2QiLCJ2YWx1ZSI6MX0seyJuYW1lIjoic2lnbmF0dXJlIiwidmFsdWUiOiIweDEyMzQ1Njc4In1dLCJjb21tZW50IjoidGVzdGluZyIsImhleCI6IjB4ZjMyYWM1YTQwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMTIzNDU2NzgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9
 */
-export const call = (to: string, bytecode: string, amount: number) => {
+export const call = (from: string, to: string, bytecode: string, amount: number) => {
     const calldata = btoa(JSON.stringify(
         {
             hex: bytecode,
@@ -67,6 +67,7 @@ export const call = (to: string, bytecode: string, amount: number) => {
         callback: callbackLocationBase64,
         calldata,
         dest: to,
+        from
     }
 
     if (amount) {

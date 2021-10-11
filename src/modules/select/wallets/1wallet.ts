@@ -231,9 +231,9 @@ function oneWallet(
                                 let res = []
                                 for (const p of data.params) {
                                     const amount = p.value || p.amount || 0
-
+                                    console.log({p})
                                     try {
-                                        const r = await ONEWallet.call(p.to, p.data, amount)
+                                        const r = await ONEWallet.call(p.from, p.to, p.data, amount)
                                         res.push(r)
                                     } catch (e) {
                                         return cb(wrapRPCError(data, e), null)

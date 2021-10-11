@@ -68,12 +68,12 @@ export const send = async (from: string, to: string, amount: number) => {
     })
 }
 
-export const call = async (to: string, bytecode: string, amount: number) => {
+export const call = async (from: string, to: string, bytecode: string, amount: number) => {
     if (popup.isOpen) {
         return null
     }
 
-    redirect.call(to, bytecode, amount)
+    redirect.call(from, to, bytecode, amount)
 
     return new Promise((resolve, reject) => {
         const handler = (crossTabEvent: string) => {
